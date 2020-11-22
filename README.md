@@ -1,2 +1,2 @@
 # game-of-life
-Game of life implatation in Python
+Game of life implantation in Python
