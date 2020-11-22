@@ -1,3 +1,5 @@
+import time
+
 def type_control(*a_args, **a_kwargs):
     def decorator(fct):
         def modified_function(*args, **kwargs):
@@ -16,3 +18,11 @@ def type_control(*a_args, **a_kwargs):
             return fct(*args, **kwargs)
         return modified_function
     return decorator
+
+def timer(fct):
+    def modified_function(*args, **kwargs):
+        t0 = time.time()
+        result = fct(*args, **kwargs)
+        print(f"{fct.__name__} took {time.time() - t0}s to run")
+        return result
+    return modified_function

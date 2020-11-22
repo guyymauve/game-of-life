@@ -1,10 +1,10 @@
 from tkinter import *
-from decorators import type_control
+from decorators import type_control, timer
 import numpy as np
 from math import floor
 from functools import partial
 
-cells_number_x = 10
+cells_number_x = 30
 cells_number_y = cells_number_x
 cells_number = (cells_number_x, cells_number_y)
 
@@ -36,6 +36,7 @@ def white(coordinates, cv, square_size):
     return cv
 
 @type_control(Canvas, np.ndarray, tuple)
+@timer
 def update_view(cv, cells, square_size):
     for i in range(cells.shape[0]):
         for j in range(cells.shape[1]):
@@ -67,6 +68,7 @@ def neighbours(x, y, cells_number):
     return ng
 
 @type_control(np.ndarray)
+@timer
 def evolution(cells):
     cells_new = cells.copy()
     for i in range(cells.shape[0]):
@@ -89,12 +91,15 @@ def canvas_click(cv, square_size, evt):
     global cells
     cell_x = floor(evt.x/square_size[0])
     cell_y = floor(evt.y/square_size[1])
-    if cells[cell_x][cell_y] == 1:
-        cells[cell_x][cell_y] = 0
-        white((cell_x, cell_y), cv, square_size)
-    elif cells[cell_x][cell_y] == 0:
-        cells[cell_x][cell_y] = 1
-        black((cell_x, cell_y), cv, square_size)
+    try:
+        if cells[cell_x][cell_y] == 1:
+            cells[cell_x][cell_y] = 0
+            white((cell_x, cell_y), cv, square_size)
+        elif cells[cell_x][cell_y] == 0:
+            cells[cell_x][cell_y] = 1
+            black((cell_x, cell_y), cv, square_size)
+    except IndexError:
+        pass
     
 
 window = Tk()
