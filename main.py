@@ -10,6 +10,8 @@ cells_number = (cells_number_x, cells_number_y)
 
 global cells
 cells = np.zeros(cells_number)
+global cells_old
+cells_ols = np.zeros(cells_number)
 
 window_width = 700
 window_height = window_width
@@ -35,14 +37,16 @@ def white(coordinates, cv, square_size):
     cv.create_rectangle(square_size_x*coordinates[0], square_size_y*coordinates[1], square_size_x*(coordinates[0]+1), square_size_y*(coordinates[1]+1), fill="white")
     return cv
 
-@type_control(Canvas, np.ndarray, tuple)
+@type_control(Canvas, tuple)
 @timer
-def update_view(cv, cells, square_size):
+def update_view(cv, square_size):
+    global cells
+    global cells_old
     for i in range(cells.shape[0]):
         for j in range(cells.shape[1]):
-            if cells[i][j] == 1:
+            if cells[i][j] == 1 and cells_old[i][j] != 1:
                 black((i, j), cv, square_size)
-            else:
+            elif cells[i][j] == 0 and cells_old[i][j] != 0:
                 white((i, j), cv, square_size)
     return cv
 
@@ -67,10 +71,12 @@ def neighbours(x, y, cells_number):
         ng.append((x, y+1))
     return ng
 
-@type_control(np.ndarray)
 @timer
-def evolution(cells):
+def evolution():
+    global cells
+    global cells_old
     cells_new = cells.copy()
+    cells_old = cells.copy()
     for i in range(cells.shape[0]):
         for j in range(cells.shape[1]):
             ng = neighbours(i, j, cells.shape)
@@ -79,13 +85,14 @@ def evolution(cells):
                 cells_new[i][j] = 1
             elif cells[i][j] == 1 and living_neighbours not in [2, 3]:
                 cells_new[i][j] = 0
-    return cells_new
+    cells = cells_new
 
 @type_control(Canvas, tuple)
 def generate(cv, square_size):
     global cells
-    cells = evolution(cells)
-    return update_view(cv, cells, square_size)
+    global cells_old
+    evolution()
+    return update_view(cv, square_size)
 
 def canvas_click(cv, square_size, evt):
     global cells
